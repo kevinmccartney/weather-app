@@ -40,3 +40,6 @@ buck-out/
 \.buckd/
 android/app/libs
 *.keystore
+
+# ignore config so API keys aren't compromised
+config.js
