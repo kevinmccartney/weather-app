@@ -13,12 +13,12 @@ import {
   Button,
   AlertIOS
 } from 'react-native';
-import { apiKey } from "./config"
+import { WEATHER_KEY, GOOGLE_KEY } from "./config"
 
 export default class WeatherApp extends Component {
 
   sendReq = () => {
-    fetch("https://api.apixu.com/v1/current.json?key=" + apiKey + "&q=43081")
+    fetch("https://api.apixu.com/v1/current.json?key=" + WEATHER_KEY + "&q=" + this.state.zipcode)
     .then((response) => response.json())
     .then((response) => {
       AlertIOS.alert(
@@ -26,7 +26,33 @@ export default class WeatherApp extends Component {
         JSON.stringify(response)
       )
     })
-    .done()
+  }
+
+  findZip = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          var { latitude, longitude } = position.coords
+          var latLong = latitude + "," + longitude
+          resolve(
+            fetch("https://maps.googleapis.com/maps/api/geocode/json?latlng=" + latLong + "&result_type=postal_code&key=" + GOOGLE_KEY)
+            .then((response) => response.json())
+            .then((response) => {
+              var zipCode = response.results[0].address_components[0].long_name
+              this.setState({ zipcode: zipCode })
+            })
+          )
+        }
+      ),
+      (error) => {
+        reject(alert(JSON.stringify(error)))
+      },
+      { enableHighAccuracy: true }
+    })
+  }
+
+  componentDidMount() {
+    this.findZip()
   }
 
   render() {
