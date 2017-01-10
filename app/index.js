@@ -13,8 +13,11 @@ import {
   AlertIOS
 } from 'react-native';
 import { WEATHER_KEY, GOOGLE_KEY } from "../config"
+import * as Actions from './actions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
 
-export default class App extends Component {
+class App extends Component {
 
   handleErrors = (response) => {
     if (!response.ok) {
@@ -92,3 +95,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
 });
+
+const mapStateToProps = state => ({
+  coords: state.coords,
+  currentWeather: state.currentWeather,
+  dailyWeather: state.dailyWeather,
+  forecast: state.forecast,
+  zip: state.zip
+})
+
+const mapDispatchToProps = dispatch => ({
+    actions: bindActionCreators(Actions, dispatch)
+})
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(App)
